@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cramrite - Cram Faster. Focus on What Matters.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #3F51B5 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .flashcard-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .flashcard {
+            width: 240px;
+            height: 160px;
+            perspective: 1000px;
+        }
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            background: white;
+            border: 2px solid #3F51B5;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Login Page Styles */
+        .login-page {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #3F51B5 0%, #764ba2 100%);
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 700;
+            color: #3F51B5;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .logo::before {
+            content: "📚";
+            font-size: 28px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        input[type="email"], input[type="password"], input[type="text"], select, textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3F51B5;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3F51B5 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #3F51B5;
+            border: 2px solid #3F51B5;
+        }
+
+        .btn-secondary:hover {
+            background: #3F51B5;
+            color: white;
+        }
+
+        .toggle-text {
+            margin-top: 20px;
+            color: #666;
+        }
+
+        .toggle-link {
+            color: #3F51B5;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .dashboard-header {
+            background: white;
+            color: #333;
+            padding: 0px 0;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .dashboard-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #3F51B5;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dashboard-content {
+            padding: 0 40px; /* Add side margins */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .dashboard-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3F51B5 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .dashboard-content {
+            padding: 0 20px;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3F51B5;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 20px;
+        }
+
+        .create-section {
+            margin-bottom: 30px;
+        }
+
+        .create-btn {
+            background: #28a745; /* Green leaf color */
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .sessions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .session-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease;
+            cursor: pointer;
+        }
+
+        .session-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .session-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .session-status {
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-in-progress {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-scheduled {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .session-info {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .session-info div {
+            margin-bottom: 5px;
+        }
+
+        /* Study Session Styles */
+        .study-session {
+            display: none;
+            background: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .study-session.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .study-header {
+            background: white;
+            color: #333;
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .study-main {
+            display: flex;
+            flex: 1;
+            gap: 20px;
+            padding: 20px 5px;
+            max-width: 100%;
+            margin: 0;
+        }
+
+        .study-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .study-sidebar {
+            width: 300px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            height: fit-content;
+        }
+
+        .timer-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .timer-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: #3F51B5;
+            margin-bottom: 10px;
+        }
+
+        .timer-label {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .timer-btn {
+            padding: 8px 16px;
+            border: 2px solid #3F51B5;
+            background: transparent;
+            color: #3F51B5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 12px;
+        }
+
+        .timer-btn.active {
+            background: #3F51B5;
+            color: white;
+        }
+
+        .circular-timer {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px
+        }
+
+        .timer-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(#4a5db8 0deg, #e1e5e9 0deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .timer-circle::before {
+            content: '';
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .timer-display {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4a5db8;
+            z-index: 2;
+            margin-top: 10;
+        }
+
+        .timer-label {
+            font-size: 12px;
+            color: #666;
+            z-index: 2;
+            margin-bottom: 0;
+        }
+
+        .pacing-score {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .pacing-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .pacing-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4a5db8;
+        }
+
+        .study-content {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-width: 700px;
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+
+        .study-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .study-tips {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .quiz-question {
+            margin-bottom: 15px;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .quiz-option {
+            padding: 10px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quiz-option:hover {
+            border-color: #3F51B5;
+            background: #f0f4ff;
+        }
+
+        .chatbot-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .chat-message.bot {
+            background: #e3f2fd;
+            margin-right: auto;
+        }
+
+        .chat-message.user {
+            background: #3F51B5;
+            color: white;
+            margin-left: auto;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+        }
+
+        .chat-send {
+            padding: 8px 16px;
+            background: #3F51B5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .break-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .break-content {
+            text-align: center;
+            color: white;
+        }
+
+        .break-title {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .break-timer {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e1e5e9;
+            border-radius: 2px;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #3F51B5 0%, #764ba2 100%);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .video-item {
+            margin-bottom: 10px;
+        }
+
+        .video-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 50px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .back-btn {
+            background: #3F51B5;
+            color: white;
+            border: 2px solid #3F51B5;
+            padding: 11px 22px;
+            margin-left: 20px; /* Add this line instead */
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .back-btn:hover {
+            background: #4a5db8;
+            border-color: #4a5db8;
+        }
+
+        .study-top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 40px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .return-dashboard-btn {
+            background: #3F51B5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .starry-stats-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #3F51B5, #764ba2);
+            padding: 80px 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .starry-stats-container .dashboard-stats {
+            position: relative;
+            z-index: 2;
+        }
+
+        .star-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+
+        .study-user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-header {
+            font-size: 42px;
+            font-weight: 800;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+            z-index: 2;
+            position: relative;
+            text-shadow: 0 0 5px rgba(255,255,255,0.6), 0 0 30px rgba(255,255,255,0.4);
+        }
+
+        .user-avatar-group {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+        }
+
+        .video-item iframe {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .create-plus {
+            width: 40px;
+            height: 40px;
+            background: #19C0DD; /* 💠 your turquoise color */
+            color: white;
+            font-weight: bold;
+            font-size: 23px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            gap: 8px;
+        }
+
+        .create-plus:hover {
+            background: #4a5db8;
+        }
+
+        .page-transition {
+            animation: fadeInScale 0.6s ease forwards;
+            opacity: 0;
+            transform: scale(0.96);
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.96);
+                filter: blur(3px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+                filter: blur(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .study-main {
+                flex-direction: column;
+            }
+            
+            .study-sidebar {
+                width: 100%;
+            }
+            
+            .study-form {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-container {
+                background: linear-gradient(135deg, #a18cd1, #fbc2eb, #fad0c4);
+                border-radius: 24px;
+                padding: 30px;
+                margin-bottom: 25px;
+                color: white;
+                position: relative;
+                overflow: hidden;
+                animation: animatedGradient 8s ease infinite;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+                box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), 0 0 60px rgba(255, 255, 255, 0.2);
+            }
+
+            @keyframes animatedGradient {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+
+            .floating-elements {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 1;
+            }
+
+            .floating-star {
+                position: absolute;
+                font-size: 24px;
+                opacity: 0.7;
+                animation: floatStar 10s infinite ease-in-out;
+            }
+
+            .floating-star:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+            .floating-star:nth-child(2) { top: 30%; left: 70%; animation-delay: 2s; }
+            .floating-star:nth-child(3) { top: 50%; left: 10%; animation-delay: 4s; }
+            .floating-star:nth-child(4) { top: 80%; left: 80%; animation-delay: 6s; }
+            .floating-star:nth-child(5) { top: 20%; left: 90%; animation-delay: 1s; }
+
+            @keyframes floatStar {
+                0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+                50% { transform: translateY(-15px) rotate(180deg); opacity: 1; }
+            }
+
+            .welcome-container::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+                background-size: 50px 50px;
+                animation: floatPattern 20s linear infinite;
+            }
+
+            @keyframes floatPattern {
+                0% { transform: translateX(-25px) translateY(-25px); }
+                100% { transform: translateX(25px) translateY(25px); }
+            }
+
+            .floating-elements {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+            }
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .fade-slide-out {
+            animation: fadeSlideOut 0.5s ease forwards;
+        }
+
+        .fade-slide-in {
+            animation: fadeSlideIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeSlideOut {
+            from {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .file-upload-area {
+            border: 2px dashed #3F51B5;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-top: 12px;
+        }
+
+        .file-upload-area:hover {
+            border-color: #4a5db8;
+            background: #e8f0fe;
+        }
+
+        .uploaded-files {
+            margin-top: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e1e5e9;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+            .upload-icon {
+                font-size: 48px;
+                margin-bottom: 15px;
+            }
+
+            .upload-text {
+                font-size: 16px;
+                font-weight: 500;
+                color: #333;
+                margin-bottom: 5px;
+            }
+
+            .upload-subtext {
+                font-size: 14px;
+                color: #666;
+            }
+
+            .study-tools-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 15px;
+                margin-bottom: 30px;
+            }
+
+            .study-tool-card {
+                background: white;
+                border: 2px solid #e1e5e9;
+                border-radius: 12px;
+                padding: 20px;
+                text-align: center;
+                cursor: pointer;
+                transition: all 0.3s ease;
+            }
+
+            .study-tool-card:hover {
+                border-color: #4a5db8;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(74, 93, 184, 0.1);
+            }
+
+            .tool-icon {
+                font-size: 32px;
+                margin-bottom: 10px;
+            }
+
+            .tool-title {
+                font-size: 16px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 8px;
+            }
+
+            .tool-description {
+                font-size: 14px;
+                color: #666;
+                line-height: 1.4;
+            }
+
+            .active-tool-content {
+                background: #f8fafc;
+                border-radius: 12px;
+                padding: 30px;
+                min-height: 400px; /* ✅ set to stable height */
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+
+
+            .tool-placeholder {
+                text-align: center;
+                color: #666;
+            }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-page">
+        <div class="login-container">
+            <img src="logo.png" alt="Cramrite Logo" style="height: 70px; margin-right: 15px;">
+            <div id="loginForm">
+                <p style="color: #666; margin-bottom: 20px; font-size: 14px;">Cram Faster. Focus on What Matters.</p>
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email" value="demo@studyflow.com">
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" value="demo123">
+                </div>
+                <button class="btn" onclick="login()">Sign In</button>
+                <p class="toggle-text">Don't have an account? <span class="toggle-link" onclick="toggleForm()">Sign up</span></p>
+            </div>
+            <div id="signupForm" style="display: none;">
+                <h2 style="margin-bottom: 20px;">Create Account</h2>
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" placeholder="Enter your email">
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" placeholder="Create a password">
+                </div>
+                <button class="btn" onclick="signup()">Create Account</button>
+                <p class="toggle-text">Already have an account? <span class="toggle-link" onclick="toggleForm()">Sign in</span></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <div class="dashboard-header">
+            <div class="container">
+                <div class="dashboard-nav">
+                    <div class="dashboard-title">
+                        <img src="logo.png" alt="Cramrite Logo" style="height: 70px; margin-right: 15px;">
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar-group">
+                            <div class="create-plus" onclick="createNewSession()" title="Create Study Material">+</div>
+                            <div class="user-avatar">JD</div>
+                        </div>
+                        <button class="back-btn" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="dashboard-content">
+            <div class="welcome-container">      
+                <div class="starry-stats-container">
+                    <canvas class="star-canvas"></canvas>
+
+                    <div class="welcome-header">Welcome back, John!</div>
+                  
+                    <div class="dashboard-stats">
+                        <div class="stat-card">
+                            <div class="stat-number">12</div>
+                            <div class="stat-label">Study Sessions</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">48h</div>
+                            <div class="stat-label">Total Study Time</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">85%</div>
+                            <div class="stat-label">Average Score</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">3</div>
+                            <div class="stat-label">Upcoming Tests</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="create-section">
+                <h3 style="margin-top: 20px; margin-bottom: 20px; font-size: 22px; color: #333;">Previously Studied Material</h3>
+            </div>
+
+            <div class="sessions-grid">
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-title">Advanced Calculus</div>
+                        <div class="session-status status-completed">Completed</div>
+                    </div>
+                    <div class="session-info">
+                        <div>  June 15, 2025</div>
+                        <div>  2h 30m</div>
+                        <div> Score: 92%</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-title">Organic Chemistry</div>
+                        <div class="session-status status-in-progress">In Progress</div>
+                    </div>
+                    <div class="session-info">
+                        <div>  July 18, 2025</div>
+                        <div>  1h 45m / 3h</div>
+                        <div> Current: 78%</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-title">Physics Mechanics</div>
+                        <div class="session-status status-scheduled">Scheduled</div>
+                    </div>
+                    <div class="session-info">
+                        <div>  July 3, 2025</div>
+                        <div>  2h planned</div>
+                        <div> Not started</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-title">Literature Analysis</div>
+                        <div class="session-status status-completed">Completed</div>
+                    </div>
+                    <div class="session-info">
+                        <div>  June 12, 2025</div>
+                        <div>  1h 20m</div>
+                        <div> Score: 88%</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-title">Statistics & Probability</div>
+                        <div class="session-status status-scheduled">Scheduled</div>
+                    </div>
+                    <div class="session-info">
+                        <div>  July 2, 2025</div>
+                        <div>  3h planned</div>
+                        <div> Not started</div>
+                    </div>
+                </div>
+
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-title">World History</div>
+                        <div class="session-status status-completed">Completed</div>
+                    </div>
+                    <div class="session-info">
+                        <div>  June 10, 2025</div>
+                        <div>  2h 15m</div>
+                        <div> Score: 95%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Study Session -->
+    <div id="studySession" class="study-session">
+        <div class="dashboard-header">
+            <div class="container">
+                <div class="dashboard-nav">
+                    <div class="dashboard-title">
+                        <img src="logo.png" alt="Cramrite Logo" style="height: 70px; margin-right: 15px;">
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar">JD</div>
+                        <button class="back-btn" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container">
+            <div class="study-main">
+                <div class="study-sidebar">
+                    <button class="return-dashboard-btn" onclick="backToDashboard()" style="width: 100%; margin-bottom: 40px;">← Return to Dashboard</button>
+                    <div class="timer-section">
+                            <div class="pacing-label">Pacing Score</div>
+                            <div class="pacing-value" id="pacingScore">50.0</div>
+                            <h1>-</h1>
+                        <div class="circular-timer">
+                            <div class="timer-circle">
+                                <div class="timer-display" id="timerDisplay">10:00</div>
+                                <div class="timer-label" id="timerLabel">Focus Time</div>
+                            </div>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="timer-btn active" id="startBtn" onclick="startTimer()">Start</button>
+                            <button class="timer-btn" id="pauseBtn" onclick="pauseTimer()">Pause</button>
+                            <button class="timer-btn" id="resetBtn" onclick="resetTimer()">Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+
+                    <div style="text-align: center; color: #666; margin-top: 15px;">
+                        <div>Session Progress</div>
+                        <div style="font-weight: 600; margin-top: 5px;">Session 1 of 4</div>
+                    </div>
+                </div>
+
+                <div class="study-content">
+                    <div id="studyForm">
+                        <h2 style="margin-bottom: 20px;">Create Your Study Plan</h2>
+                        <div class="study-form">
+                            <div class="form-group">
+                                <label for="subject">Subject</label>
+                                <input type="text" id="subject" placeholder="e.g., Mathematics">
+                            </div>
+                            <div class="form-group">
+                                <label for="studyTime">Total Study Time</label>
+                                <select id="studyTime">
+                                    <option value="1">1 hour</option>
+                                    <option value="2">2 hours</option>
+                                    <option value="3">3 hours</option>
+                                    <option value="4">4 hours</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="breakLength">Break Length</label>
+                                <select id="breakLength">
+                                    <option value="5">5 minutes</option>
+                                    <option value="10">10 minutes</option>
+                                    <option value="15">15 minutes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="testDate">Test Date</label>
+                                <input type="date" id="testDate">
+                            </div>
+                            <div class="form-group full-width">
+                                        <label for="studyGoals">Study Goals</label>
+                                        <textarea id="studyGoals" rows="3" placeholder="What do you want to focus on in this session?">Practice derivatives, integration by parts, and limit theorems for calculus exam</textarea>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label>Upload Study Materials</label>
+                                        <div class="file-upload-area" onclick="document.getElementById('fileInput').click()">
+                                            <div class="upload-icon" style="border: 3px solid #3F51B5; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 36px; font-weight: bold; color: #3F51B5; background: white; border-radius: 8px;">+</div>
+                                            <div class="upload-text">Drag & drop files here or click to browse</div>
+                                            <div class="upload-subtext">PDF, DOCX, TXT, images supported</div>
+                                            <input type="file" id="fileInput" multiple accept=".pdf,.docx,.txt,.jpg,.png" style="display: none;">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button class="btn" onclick="generateStudyPlan()">Generate Study Plan</button>
+                            </div>
+
+                    <div id="studyContent" style="display: none;">
+                        <h2 style="margin-bottom: 20px;">Calculus Exam Study Tools</h2>
+                        
+                        <div class="study-tools-grid">
+                            <div class="study-tool-card" onclick="openTool('flashcards')">
+                                <div class="tool-icon">🗂️</div>
+                                <div class="tool-title">Flashcards</div>
+                                <div class="tool-description">Review key calculus concepts and formulas</div>
+                            </div>
+                            
+                            <div class="study-tool-card" onclick="openTool('chatbot')">
+                                <div class="tool-icon">🤖</div>
+                                <div class="tool-title">AI Tutor</div>
+                                <div class="tool-description">Get personalized help with calculus problems</div>
+                            </div>
+                            
+                            <div class="study-tool-card" onclick="openTool('quiz')">
+                                <div class="tool-icon">🧠</div>
+                                <div class="tool-title">Practice Quiz</div>
+                                <div class="tool-description">Test your knowledge with adaptive questions</div>
+                            </div>
+                            
+                            <div class="study-tool-card" onclick="openTool('videos')">
+                                <div class="tool-icon">📺</div>
+                                <div class="tool-title">Video Library</div>
+                                <div class="tool-description">Watch curated calculus tutorials</div>
+                            </div>
+                            
+                            <div class="study-tool-card" onclick="openTool('notes')">
+                                <div class="tool-icon">📝</div>
+                                <div class="tool-title">Smart Notes</div>
+                                <div class="tool-description">Organize and review your study notes</div>
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="active-tool-content" id="activeToolContent">
+                            <div class="tool-placeholder">
+                                <h3>Select a study tool to get started</h3>
+                                <p>Choose from the options above to begin your focused study session.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Break Overlay -->
+    <div id="breakOverlay" class="break-overlay">
+        <div class="break-content">
+            <div class="break-title">🧘 Break Time</div>
+            <div class="break-timer" id="breakTimer">5:00</div>
+            <div class="break-activity">
+                <iframe width="400" height="225" src="https://www.youtube.com/embed/1ZYbU82GVz4" 
+                        frameborder="0" allowfullscreen></iframe>
+                <p style="margin-top: 15px;">Take a deep breath and relax your mind</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPage = 'login';
+        let timerInterval;
+        let currentTime = 10 * 60; // 10 minutes in seconds
+        let pacingScore = 50.0;
+        let activityBonus = 0;
+        let inactivityPenalty = 0;
+        let isRunning = false;
+        let isBreakTime = false;
+
+        function toggleForm() {
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                signupForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                signupForm.style.display = 'block';
+            }
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (email && password) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboard').classList.add('active');
+                document.getElementById('dashboard').classList.add('page-transition');
+                document.getElementById('dashboard').classList.add('page-transition');
+                currentPage = 'dashboard';
+            } else {
+                alert('Please enter both email and password');
+            }
+        }
+
+        function signup() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            if (name && email && password) {
+                alert('Account created successfully!');
+                toggleForm();
+            } else {
+                alert('Please fill in all fields');
+            }
+        }
+
+        function logout() {
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('loginPage').style.display = 'block';
+            currentPage = 'login';
+        }
+
+        function createNewSession() {
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('studySession').classList.add('active');
+            document.getElementById('studySession').classList.add('page-transition');
+            currentPage = 'study';
+        }
+
+        function backToDashboard() {
+            document.getElementById('studySession').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+            document.getElementById('dashboard').classList.add('page-transition');
+            document.getElementById('dashboard').classList.add('page-transition');
+            currentPage = 'dashboard';
+            
+            // Reset timer
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            isRunning = false;
+            currentTime = 25 * 60;
+            updateTimerDisplay();
+        }
+
+        function generateStudyPlan() {
+            const subject = document.getElementById('subject').value;
+            const studyTime = document.getElementById('studyTime').value;
+            const breakLength = document.getElementById('breakLength').value;
+            const testDate = document.getElementById('testDate').value;
+            const studyGoals = document.getElementById('studyGoals').value;
+            
+            if (!subject || !testDate) {
+                alert('Please fill in at least the subject and test date');
+                return;
+            }
+            
+            const form = document.getElementById('studyForm');
+            const content = document.getElementById('studyContent');
+
+            form.classList.add('fade-slide-out');
+
+            setTimeout(() => {
+                form.style.display = 'none';
+                content.style.display = 'block';
+                content.classList.add('fade-slide-in');
+            }, 500);
+
+            
+            // Update study tips based on subject
+            updateStudyTips(subject);
+        }
+
+        function updateStudyTips(subject) {
+            const tips = {
+                'Mathematics': [
+                    'Practice solving problems step by step',
+                    'Understand the why behind formulas',
+                    'Work on similar problems repeatedly',
+                    'Draw diagrams to visualize concepts'
+                ],
+                'Science': [
+                    'Create concept maps to connect ideas',
+                    'Use mnemonics for complex terms',
+                    'Conduct virtual experiments',
+                    'Explain concepts in your own words'
+                ],
+                'Literature': [
+                    'Read actively with annotations',
+                    'Analyze themes and character development',
+                    'Practice writing analytical essays',
+                    'Discuss interpretations with others'
+                ],
+                'History': [
+                    'Create timelines for events',
+                    'Connect cause and effect relationships',
+                    'Use primary and secondary sources',
+                    'Practice essay writing skills'
+                ]
+            };
+            
+            // This would update the tips section dynamically
+            console.log('Updated tips for', subject);
+        }
+
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                document.getElementById('startBtn').classList.add('active');
+                document.getElementById('pauseBtn').classList.remove('active');
+                
+                timerInterval = setInterval(() => {
+                    currentTime--;
+                    updateTimerDisplay();
+                    updateProgress();
+                    updatePacingScore();
+                    
+                    if (currentTime <= 0) {
+                        if (!isBreakTime) {
+                            // Start break
+                            startBreak();
+                        } else {
+                            // Break finished, start next session
+                            endBreak();
+                        }
+                    }
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            if (isRunning) {
+                isRunning = false;
+                clearInterval(timerInterval);
+                document.getElementById('startBtn').classList.remove('active');
+                document.getElementById('pauseBtn').classList.add('active');
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            currentTime = isBreakTime ? 5 * 60 : 25 * 60;
+            updateTimerDisplay();
+            updateProgress();
+            document.getElementById('startBtn').classList.remove('active');
+            document.getElementById('pauseBtn').classList.remove('active');
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(currentTime / 60);
+            const seconds = currentTime % 60;
+            const display = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = display;
+            
+            if (isBreakTime) {
+                document.getElementById('breakTimer').textContent = display;
+            }
+        }
+
+        function updatePacingScore() {
+            // Increase score for activity, decrease for inactivity
+            if (isRunning) {
+                activityBonus += 0.1;
+                pacingScore = Math.min(100, pacingScore + activityBonus);
+            } else {
+                inactivityPenalty += 0.05;
+                pacingScore = Math.max(0, pacingScore - inactivityPenalty);
+            }
+            
+            document.getElementById('pacingScore').textContent = pacingScore.toFixed(1);
+            
+            // Update circular progress
+            const progress = ((10 * 60 - currentTime) / (10 * 60)) * 360;
+            document.querySelector('.timer-circle').style.background = 
+                `conic-gradient(#4a5db8 ${progress}deg, #e1e5e9 ${progress}deg)`;
+        }
+
+        function updateProgress() {
+            const totalTime = isBreakTime ? 5 * 60 : 25 * 60;
+            const elapsed = totalTime - currentTime;
+            const progress = (elapsed / totalTime) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function startBreak() {
+            isBreakTime = true;
+            currentTime = 5 * 60; // 5 minutes break
+            document.getElementById('timerLabel').textContent = 'Break Time';
+            document.getElementById('breakOverlay').style.display = 'flex';
+            updateTimerDisplay();
+            updateProgress();
+        }
+
+        function endBreak() {
+            isBreakTime = false;
+            currentTime = 25 * 60; // Back to 25 minutes
+            document.getElementById('timerLabel').textContent = 'Focus Time';
+            document.getElementById('breakOverlay').style.display = 'none';
+            clearInterval(timerInterval);
+            isRunning = false;
+            updateTimerDisplay();
+            updateProgress();
+            document.getElementById('startBtn').classList.remove('active');
+            document.getElementById('pauseBtn').classList.remove('active');
+        }
+
+        function selectOption(option) {
+            // Remove previous selections
+            document.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.style.background = '';
+                opt.style.borderColor = '#e1e5e9';
+            });
+            
+            // Highlight selected option
+            option.style.background = '#3F51B5';
+            option.style.color = 'white';
+            option.style.borderColor = '#3F51B5';
+            
+            // Show feedback after a delay
+            setTimeout(() => {
+                if (option.textContent === 'A) 2x') {
+                    option.style.background = '#28a745';
+                    option.style.borderColor = '#28a745';
+                } else {
+                    option.style.background = '#dc3545';
+                    option.style.borderColor = '#dc3545';
+                    // Also highlight correct answer
+                    document.querySelectorAll('.quiz-option').forEach(opt => {
+                        if (opt.textContent === 'A) 2x') {
+                            opt.style.background = '#28a745';
+                            opt.style.color = 'white';
+                            opt.style.borderColor = '#28a745';
+                        }
+                    });
+                }
+            }, 500);
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const chatMessages = document.getElementById('chatMessages');
+            const message = chatInput.value.trim();
+            
+            if (message) {
+                // Add user message
+                const userMessage = document.createElement('div');
+                userMessage.className = 'chat-message user';
+                userMessage.textContent = message;
+                chatMessages.appendChild(userMessage);
+                
+                // Clear input
+                chatInput.value = '';
+                
+                // Simulate bot response
+                setTimeout(() => {
+                    const botMessage = document.createElement('div');
+                    botMessage.className = 'chat-message bot';
+                    botMessage.textContent = getBotResponse(message);
+                    chatMessages.appendChild(botMessage);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+                
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        function getBotResponse(message) {
+            const responses = [
+                "A derivative is a measure of how a function changes as its input changes. In simple terms, it tells you the rate of change or slope of a function at any given point. In calculus, derivatives help describe how something is changing — like speed, growth, or cost — at a precise instant. Example: f(x) = x²; Solve it yourself!   Final result: f'(x) = 2x. 🔁 In General: For f(x) = xⁿ, f'(x) = n × xⁿ⁻¹ (this is called the Power Rule)"
+            ];
+            
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        function openTool(toolType) {
+            const toolContent = document.getElementById('activeToolContent');
+            
+            const toolContents = {
+                chatbot: `
+                    <h3>🤖 AI Calculus Tutor</h3>
+                    <div class="chatbot-section">
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="chat-message bot">
+                                Hello! I can help you understand derivatives, chain rule, product rule, and more.<br>
+                                Try asking something like <em>“How do you take the derivative of ln(x²)?”</em>
+                            </div>
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="chatInput" placeholder="Ask your calculus question here...">
+                            <button class="chat-send" onclick="sendMessage()">Send</button>
+                        </div>
+                    </div>
+                `,
+
+                quiz: `
+                    <h3>🧠 Calculus Practice Quiz</h3>
+                    <div class="quiz-section">
+                        <div class="quiz-question">
+                            <p><strong>1.</strong> What is the derivative of f(x) = x³ + 2x² - 5x + 3?</p>
+                            <div class="quiz-options">
+                                <div class="quiz-option" onclick="selectOption(this)">A) 3x² + 4x - 5</div>
+                                <div class="quiz-option" onclick="selectOption(this)">B) x² + 4x - 5</div>
+                                <div class="quiz-option" onclick="selectOption(this)">C) 3x² + 2x - 5</div>
+                                <div class="quiz-option" onclick="selectOption(this)">D) 3x³ + 4x² - 5x</div>
+                            </div>
+                        </div>
+                        <div class="quiz-question">
+                            <p><strong>2.</strong> What is the derivative of e^x?</p>
+                            <div class="quiz-options">
+                                <div class="quiz-option" onclick="selectOption(this)">A) x * e^x</div>
+                                <div class="quiz-option" onclick="selectOption(this)">B) e^x</div>
+                                <div class="quiz-option" onclick="selectOption(this)">C) ln(x)</div>
+                                <div class="quiz-option" onclick="selectOption(this)">D) 1/x</div>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                quiz: `
+                    <h3>🧠 Calculus Practice Quiz</h3>
+                    <div class="quiz-section">
+                        <div class="quiz-question">
+                            <p><strong>Question:</strong> Find the derivative of f(x) = x³ + 2x² - 5x + 3</p>
+                        </div>
+                        <div class="quiz-options">
+                            <div class="quiz-option" onclick="selectOption(this)">A) <strong>3x² + 4x - 5</strong></div>
+                            <div class="quiz-option" onclick="selectOption(this)">B) x² + 4x - 5</div>
+                            <div class="quiz-option" onclick="selectOption(this)">C) 3x² + 2x - 5</div>
+                            <div class="quiz-option" onclick="selectOption(this)">D) 3x³ + 4x² - 5x</div>
+                        </div>
+                    </div>
+                `,
+                videos: `
+                    <h3>📺 Calculus Video Library</h3>
+                    <div class="video-grid">
+
+                    <!-- Derivatives Basics (5 min) -->
+                    <div class="video-item">
+                        <div class="video-title">-</div>
+                        <div class="video-title">Derivatives Basics (5 min)</div>
+                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/3wMKpCG1M8k" title="Derivatives Basics" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-item">
+                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/AbtiI8MPhb0" title="Derivatives Basics" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-item">
+                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/LN3X4Xj9fSI" title="Derivatives Basics" frameborder="0" allowfullscreen></iframe>
+                    </div>
+
+                    <!-- Integration Techniques (15 min) -->
+                    <div class="video-item">
+                        <div class="video-title">-</div>
+                        <div class="video-title">Integration Techniques (15 min)</div>
+                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/IQY5kj_eYQk" title="Integration Techniques" frameborder="1" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-item">
+                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/dW0qnIejaS0" title="Integration Techniques" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-item">
+                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/vLdwu6nDWqk" title="Integration Techniques" frameborder="0" allowfullscreen></iframe>
+                    </div>
+
+                    <!-- Limits and Continuity (25 min) -->
+                    <div class="video-item">
+                        <div class="video-title">-</div>
+                        <div class="video-title">Limits and Continuity (25 min)</div>
+                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/9brk313DjV8" title="Limits and Continuity" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-item">
+                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/YNstP0ESndU" title="Limits and Continuity" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                    <div class="video-item">
+                        <iframe width="100%" height="240" src="https://www.youtube.com/embed/0ZoSxPg6JSQ" title="Limits and Continuity" frameborder="0" allowfullscreen></iframe>
+                    </div>
+
+                    </div>
+                `,
+                notes: `
+                    <h3>📝 Smart Notes</h3>
+                    <div class="notes-section">
+                        <textarea placeholder="Take notes here..." rows="10" style="width: 100%; padding: 15px; border-radius: 8px; border: 2px solid #e1e5e9;"></textarea>
+                    </div>
+                `,
+                calculator: `
+                    <h3>🔢 Graphing Calculator</h3>
+                    <div class="calculator-section">
+                        <div class="calculator-display">
+                            <div style="background: #f0f0f0; padding: 20px; border-radius: 8px; text-align: center;">
+                                <p>Interactive Graphing Calculator</p>
+                                <p style="color: #666; font-size: 14px;">Graph functions, find derivatives, and visualize calculus concepts</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            };
+            
+            toolContent.innerHTML = toolContents[toolType] || toolContents.flashcards;
+        }
+
+        // Allow Enter key to send chat messages
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('chatInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+
+        // Initialize timer display
+        updateTimerDisplay();
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.querySelector('.star-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const stars = Array.from({ length: 100 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: Math.random() * 1.5 + 0.5,
+            opacity: Math.random(),
+            speed: Math.random() * 0.005 + 0.002
+        }));
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, 2 * Math.PI);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.fill();
+                star.opacity += star.speed;
+                if (star.opacity >= 1 || star.opacity <= 0) {
+                    star.speed = -star.speed;
+                }
+            });
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    });
+    </script>
+
+</body>
+</html>
